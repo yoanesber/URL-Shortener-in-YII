@@ -20,17 +20,13 @@ use yii\widgets\LinkPager;
                             <label>URL Original</label>
                             <input class="form-control" placeholder="URL" id="form-url-original">
                         </div>
-                        <div class="form-group">
-                            <label>URL Conversion</label>
-                            <input readonly class="form-control" placeholder="URL Conversion" id="form-url-conversion">
-                        </div>
                         <div class="alert alert-info" id="form-url-alert">Please fill URL above.</div>
                     </form>
                 </div>
                 <div class="panel-footer">
                     <div class="form-group" class="text-right">
                         <button type="button" class="btn btn-primary" id="btn-save-form-url-list">Save</button>
-                        <button type="button" class="btn btn-primary" id="btn-update-form-url-list">Save</button>
+                        <!-- <button type="button" class="btn btn-primary" id="btn-update-form-url-list">Save</button> -->
                         <button type="button" class="btn btn-warning" id="btn-cancel-form-url-list">Cancel</button>
                     </div>
                 </div>

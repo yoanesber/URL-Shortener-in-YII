@@ -120,28 +120,7 @@ $("#btn-signup-signin").on("click", function(){
 
 
 $("#row-form-url-list").css("display", "none");
-$("#form-url-original").on("keyup", function(){
-    var url_original = $("#form-url-original").val();
-    $.ajax({
-        type: "POST",
-        url: "/urlconversion/baseconvert",
-        data: {url: url_original},
-        dataType: "json",
-        success: function(response, status) {
-            if(response && !response.error){
-                $("#form-url-conversion").val(response.url_conversion);
-            }
-            else {
-                $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
-                $("#form-url-alert").html("Sorry, there's something problem in our internal.");
-            }
-        },
-        error: function (response, status) {
-            $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
-            $("#form-url-alert").html("Sorry, there's something problem in our internal.");
-        },
-    });
-});
+
 $("#btn-add-form-url-list").on("click", function(){
     $("#row-table-url-list").css("display", "none");
     $("#row-form-url-list").css("display", "block");
@@ -160,6 +139,7 @@ $("#btn-add-form-url-list").on("click", function(){
             success: function(response, status) {
                 if(response && !response.error){
                     location.reload();
+                    // alert(JSON.stringify(response));
                 }
                 else {
                     $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
