@@ -108,7 +108,7 @@ class UserController extends Controller
 
             if($user->username !== null && $user->auth_key !== null){
                 $find_user = User::find()->where('username=:username', [':username' => $user->username])->one();
-                if($find_user->username === null){
+                if($find_user['username'] === null){
                     if($user->insert() !== false)
                         $last_result['error'] = false;
                     else $last_result['error_message'] = "There's something problem when create user!";
