@@ -15,22 +15,44 @@ class GoogleUrlApi {
     var $apiKey = 'AIzaSyBJoSKBvJeIFAo5QFulDksofooOgGRv8RM';
 
     public function shorten($url) {
-        $response = $this->send($url);
+        $response = $this->send($url, 'shorten');
+		return (isset($response)) ? $response:false;
+    }
+
+    public function expand($url) {
+        $response = $this->send($url, 'expand');
+		return (isset($response)) ? $response:false;
+    }
+
+    public function statistic($url) {
+        $response = $this->send($url, 'statistic');
 		return (isset($response)) ? $response:false;
     }
     
-	function send($longUrl) {
-        $postData = array('longUrl' => $longUrl, 'key' => $this->apiKey);
+	function send($url, $type='shorten') {
+        $postData = array('longUrl' => $url, 'key' => $this->apiKey);
         $jsonData = json_encode($postData);
 
         $curlObj = curl_init();
-        curl_setopt($curlObj, CURLOPT_URL, 'https://www.googleapis.com/urlshortener/v1/url?key='.$this->apiKey);
-        curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curlObj, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curlObj, CURLOPT_HEADER, 0);
-        curl_setopt($curlObj, CURLOPT_HTTPHEADER, array('Content-type:application/json'));
-        curl_setopt($curlObj, CURLOPT_POST, 1);
-        curl_setopt($curlObj, CURLOPT_POSTFIELDS, $jsonData);
+
+        if($type == 'shorten'){
+            curl_setopt($curlObj, CURLOPT_URL, 'https://www.googleapis.com/urlshortener/v1/url?key='.$this->apiKey);
+            curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curlObj, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($curlObj, CURLOPT_HEADER, 0);
+            curl_setopt($curlObj, CURLOPT_HTTPHEADER, array('Content-type:application/json'));
+            curl_setopt($curlObj, CURLOPT_POST, 1);
+            curl_setopt($curlObj, CURLOPT_POSTFIELDS, $jsonData);
+        }
+        else if($type == 'expand'){
+            curl_setopt($curlObj, CURLOPT_URL, 'https://www.googleapis.com/urlshortener/v1/url?key='.$this->apiKey.'&shortUrl='.$url);
+            curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, 1);
+        }
+        else if($type == 'statistic'){
+            curl_setopt($curlObj, CURLOPT_URL, 'https://www.googleapis.com/urlshortener/v1/url?key='.$this->apiKey.'&shortUrl='.$url.'&projection=FULL');
+            curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, 1);
+        }
+        
 
         $response = curl_exec($curlObj);
         $json = json_decode($response);
@@ -79,47 +101,26 @@ class UrlconversionController extends Controller
         ]);
     }
 
-    public function actionView($id = null){
-        if($id === null )
-            $sql = 'SELECT * FROM todolist ';
-        else $sql = 'SELECT * FROM todolist WHERE id=:id';
-        
-        $todolist = Todolist::findBySql($sql, [':id' => $id])->all();
-        
+    public function actionGetstatistic($id = null){
         $last_result = [
             'error' => true,
             'data' => null
         ];
-        $array_todolist = array();
-        foreach($todolist as $data){
-            $task_start_date = strtotime($data->task_start_date);
-            $task_start_date = date("Y-m-d H:i:s", $task_start_date);
-            $task_end_date = strtotime($data->task_end_date);
-            $task_end_date = date("Y-m-d H:i:s", $task_end_date);
 
-            $tl = [
-                'id' => $data->id,
-                'task_name' => $data->task_name,
-                'task_desc' => $data->task_desc,
-                'task_start_date' => $task_start_date,
-                'task_end_date' => $task_end_date,
-                'task_place' => $data->task_place,
-                'status_id' => $data->status_id,
-                'createdAt' => $data->createdAt,
-                'createdBy' => $data->createdBy,
-                'updatedAt' => $data->updatedAt,
-                'updatedBy' => $data->updatedBy
-            ];
+        if($id !== null ){
+            $sql = 'SELECT * FROM url_conversions WHERE id=:id';
+            $urlconversion = UrlConversion::findBySql($sql, [':id' => $id])->one();
+            
+            if(isset($urlconversion->id)){
+                $googleUrlApi = new GoogleUrlApi();
+                $googleUrlApiResponse = $googleUrlApi->statistic($urlconversion->url_conversion);
 
-            $array_todolist[] = $tl;
+                $last_result['error'] = false;
+                $last_result['data'] = $googleUrlApiResponse;
+            }
+            else $last_result['error_message'] = "There's something problem when findBySql!";
         }
-
-        if(sizeof($array_todolist) > 0){
-            $last_result = [
-                'error' => false,
-                'data' => $array_todolist
-            ];
-        }
+        else $last_result['error_message'] = "There's something problem! Parameter id is null!";
 
         return json_encode($last_result);
     }

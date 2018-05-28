@@ -16,6 +16,7 @@ class AppAsset extends AssetBundle
         'assets/30f5b990/js/bootstrap-datetimepicker.min.css'
     ];
     public $js = [
+        'js/googlechart.js',
         'js/site.js',
         'assets/30f5b990/js/moment-with-locales.js',
         'assets/30f5b990/js/bootstrap-datetimepicker.min.js'

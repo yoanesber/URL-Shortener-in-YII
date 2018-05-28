@@ -41,10 +41,10 @@ use yii\widgets\LinkPager;
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>URL Original</th>
-                        <th>URL Conversion</th>
+                        <th>Long URL</th>
+                        <th>Shortened URL</th>
                         <th>Added Date</th>
-                        <!-- <th>Modifiy</th> -->
+                        <th>View Statistic</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,10 +56,10 @@ use yii\widgets\LinkPager;
                         <td><a target='_blank' href='<?= $curr_row['url_original'] ?>'><?= $curr_row['url_original'] ?></a></td>
                         <td><a target='_blank' href='<?= $curr_row['url_conversion'] ?>'><?= $curr_row['url_conversion'] ?></a></td>
                         <td><?= $curr_row['createdAt'] ?></td>
-                        <!-- <td class="text-center">
-                            <button class="btn btn-success btn-xs" onclick="editUrl(<?= $curr_row['id'] ?>)">Edit</button>
-                            <button class="btn btn-danger btn-xs" onclick="deleteUrl(<?= $curr_row['id'] ?>)">Delete</button>
-                        </td> -->
+                        <td class="text-center">
+                            <button class="btn btn-success btn-xs" onclick="viewStatistic(<?= $curr_row['id'] ?>)">Statistic</button>
+                            <!-- <button class="btn btn-danger btn-xs" onclick="deleteUrl(<?= $curr_row['id'] ?>)">Delete</button> -->
+                        </td>
                     </tr>
                     <?php endfor; ?>
                     <?php else: ?>
@@ -72,3 +72,25 @@ use yii\widgets\LinkPager;
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="statisticModal" tabindex="-1" role="dialog" aria-labelledby="statisticModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="statisticModalLabel">Visit Statistics</h4>
+            </div>
+            <div class="modal-body" id="statisticModalBody">
+                <div id="country_chart_div"></div>
+                <div id="browser_chart_div"></div>
+                <div id="platform_chart_div"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

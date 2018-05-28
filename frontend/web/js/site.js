@@ -187,3 +187,86 @@ $("#btn-cancel-delete-url-list").on("click", function(){
 $("#btn-cancel-form-url-list").on("click", function(){
     location.reload();
 });
+
+function viewStatistic(id){
+    $.ajax({
+        type: "GET",
+        url: "/urlconversion/getstatistic/" + id,
+        dataType: "json",
+        success: function(response, status) {
+            if(response && !response.error){
+                $('#statisticModal').modal('show');
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(drawChart);
+
+                function drawChart() {
+                    /*COUNTRY*/
+                    var data = [['Countries', 'Visitors']];
+                    var data_countries = response.data.analytics.allTime.countries;
+                    for(var i=0; i<data_countries.length; i++){
+                        data.push([
+                            data_countries[i].id,
+                            data_countries[i].count,
+                        ]);
+                    }
+
+                    data = google.visualization.arrayToDataTable(data);
+              
+                    var country_chart_option = {
+                        title: 'Statistics by Country',
+                        is3D: true,
+                    };
+            
+                    var country_chart = new google.visualization.PieChart(document.getElementById('country_chart_div'));
+                    country_chart.draw(data, country_chart_option);
+
+                    /*PLATFORM*/
+                    var data = [['Platforms', 'Visitors']];
+                    var data_platforms = response.data.analytics.allTime.platforms;
+                    for(var i=0; i<data_platforms.length; i++){
+                        data.push([
+                            data_platforms[i].id,
+                            data_platforms[i].count,
+                        ]);
+                    }
+
+                    data = google.visualization.arrayToDataTable(data);
+              
+                    var platform_chart_option = {
+                        title: 'Statistics by Platform',
+                        is3D: true,
+                    };
+            
+                    var platform_chart = new google.visualization.PieChart(document.getElementById('platform_chart_div'));
+                    platform_chart.draw(data, platform_chart_option);
+
+                    /*BROWSER*/
+                    var data = [['Browsers', 'Visitors']];
+                    var data_browsers = response.data.analytics.allTime.browsers;
+                    for(var i=0; i<data_browsers.length; i++){
+                        data.push([
+                            data_browsers[i].id,
+                            data_browsers[i].count,
+                        ]);
+                    }
+
+                    data = google.visualization.arrayToDataTable(data);
+              
+                    var browser_chart_option = {
+                        title: 'Statistics by Browser',
+                        is3D: true,
+                    };
+            
+                    var browser_chart = new google.visualization.PieChart(document.getElementById('browser_chart_div'));
+                    browser_chart.draw(data, browser_chart_option);
+                }
+            }
+            else {
+                alert('aaa');
+            }
+        },
+        error: function (response, status) {
+            alert(JSON.stringify(response));
+        },
+    });
+}

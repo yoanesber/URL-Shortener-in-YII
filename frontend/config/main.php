@@ -47,10 +47,8 @@ return [
                 'POST <controller:\w+>/<action:\w+>' => '<controller>/<action>',
                 'GET <controller:[\w-]+>' => '<controller>/index',
                 'GET <controller:[\w-]+>/<id:\d+>' => '<controller>/view',
-                'GET <controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+                'GET <controller:[\w-]+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 'PUT <controller:[\w-]+>/<id:\d+>' => '<controller>/update',
-                
-                
             ],
         ],
     ],
