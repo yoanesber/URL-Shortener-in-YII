@@ -26,7 +26,7 @@ use yii\widgets\LinkPager;
                 <div class="panel-footer">
                     <div class="form-group" class="text-right">
                         <button type="button" class="btn btn-success" id="btn-signin-signin">Sign In</button>
-                        <button type="button" class="btn btn-warning" id="btn-signin-signup">Hav no account ? Sign Up!</button>
+                        <button type="button" class="btn btn-warning" id="btn-signin-signup">Have no account ? Sign Up!</button>
                     </div>
                 </div>
             </div>

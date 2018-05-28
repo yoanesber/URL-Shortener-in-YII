@@ -11,6 +11,34 @@ use yii\data\Pagination;
 use app\models\User;
 use app\models\UrlConversion;
 
+class GoogleUrlApi {
+    var $apiKey = 'AIzaSyBJoSKBvJeIFAo5QFulDksofooOgGRv8RM';
+
+    public function shorten($url) {
+        $response = $this->send($url);
+		return (isset($response)) ? $response:false;
+    }
+    
+	function send($longUrl) {
+        $postData = array('longUrl' => $longUrl, 'key' => $this->apiKey);
+        $jsonData = json_encode($postData);
+
+        $curlObj = curl_init();
+        curl_setopt($curlObj, CURLOPT_URL, 'https://www.googleapis.com/urlshortener/v1/url?key='.$this->apiKey);
+        curl_setopt($curlObj, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curlObj, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curlObj, CURLOPT_HEADER, 0);
+        curl_setopt($curlObj, CURLOPT_HTTPHEADER, array('Content-type:application/json'));
+        curl_setopt($curlObj, CURLOPT_POST, 1);
+        curl_setopt($curlObj, CURLOPT_POSTFIELDS, $jsonData);
+
+        $response = curl_exec($curlObj);
+        $json = json_decode($response);
+        curl_close($curlObj);
+        return $json;
+	}		
+}
+
 /**
  * Site controller
  */
@@ -97,25 +125,29 @@ class UrlconversionController extends Controller
     }
 
     public function actionCreate(){
-        $last_result = [
-            'error' => true
-        ];
+        $last_result = ['error' => true];
         $request = (Yii::$app->request)?Yii::$app->request:null;
         $session = Yii::$app->session;
+
         if($request !== null){
             $urlconversion = new Urlconversion();
-            $urlconversion->url_original = $request->getBodyParam('url_original');
+            $urlconversion->url_original = ($request->post('url_original'))?$request->post('url_original'):null;
             $urlconversion->createdAt = date('Y-m-d H:i:s');
             $urlconversion->createdBy = $session['user_id'];
-            if($urlconversion->save() !== false){
-                $last_inserted = $urlconversion->id;
-                // $url_conversion = $this->getShortenedURL($last_inserted);
-                        
-                $last_result = [
-                    'error' => false
-                ];
+            if($urlconversion->url_original !== null && filter_var($urlconversion->url_original, FILTER_VALIDATE_URL)){
+                $googleUrlApi = new GoogleUrlApi();
+                $googleUrlApiResponse = $googleUrlApi->shorten($urlconversion->url_original);
+                if($googleUrlApiResponse !== false){
+                    $urlconversion->url_conversion = $googleUrlApiResponse->id;
+                    if($urlconversion->insert() !== false)
+                        $last_result['error'] = false;
+                    else $last_result['error_message'] = "There's something problem when save URL!";
+                }
+                else $last_result['error_message'] = "There's something problem when get google URL API!";
             }
+            else $last_result['error_message'] = "There's something problem. URL is not valid!";
         }
+        else $last_result['error_message'] = "There's something problem. Request is null!";
 
         return json_encode($last_result);
     }

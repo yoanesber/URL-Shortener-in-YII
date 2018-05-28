@@ -53,8 +53,8 @@ use yii\widgets\LinkPager;
                     <?php $curr_row = $urlconversion[$i]; ?>
                     <tr>
                         <td class="text-center"><?= $i + 1 ?></td>
-                        <td><?= $curr_row['url_original'] ?></td>
-                        <td><?= $curr_row['url_conversion'] ?></td>
+                        <td><a target='_blank' href='<?= $curr_row['url_original'] ?>'><?= $curr_row['url_original'] ?></a></td>
+                        <td><a target='_blank' href='<?= $curr_row['url_conversion'] ?>'><?= $curr_row['url_conversion'] ?></a></td>
                         <td><?= $curr_row['createdAt'] ?></td>
                         <!-- <td class="text-center">
                             <button class="btn btn-success btn-xs" onclick="editUrl(<?= $curr_row['id'] ?>)">Edit</button>
@@ -64,7 +64,7 @@ use yii\widgets\LinkPager;
                     <?php endfor; ?>
                     <?php else: ?>
                     <tr>
-                        <td colspan="3">No task found.</td>
+                        <td colspan="4">No task found.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

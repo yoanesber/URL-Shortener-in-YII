@@ -20,11 +20,17 @@ $("#btn-signin-signin").on("click", function(){
             success: function(response, status) {
                 if(response && !response.error){
                     // alert(JSON.stringify(response));
-                    location.reload();
+                    $("#signin-alert").removeClass("alert-danger").addClass("alert-success");
+                    $("#signin-alert").html("Please wait, you are redirecting...");
+                    setTimeout(function(){
+                        location.reload();
+                     }, 2000);
                 }
                 else {
                     $("#signin-alert").removeClass("alert-success").addClass("alert-danger");
                     $("#signin-alert").html("Sorry, there's something problem in our internal.");
+                    if(response && response.error && response.error_message !== null)
+                        $("#signin-alert").html(response.error_message);
                 }
             },
             error: function (response, status) {
@@ -64,7 +70,7 @@ $("#btn-signup-signup").on("click", function(){
     
     if(form_submit){
         $("#signup-alert").removeClass("alert-danger").addClass("alert-success");
-        $("#signup-alert").html("Please wait, you are redirecting...");
+        $("#signup-alert").html("Please wait, we are validating...");
 
         $.ajax({
             type: "POST",
@@ -74,13 +80,14 @@ $("#btn-signup-signup").on("click", function(){
             success: function(response, status) {
                 if(response && !response.error){
                     setTimeout(function(){
-                        $("#panel-sigin").css("display", "block");
-                        $("#panel-sigup").css("display", "none");
+                        location.reload();
                      }, 2000);
                 }
                 else {
                     $("#signup-alert").removeClass("alert-success").addClass("alert-danger");
                     $("#signup-alert").html("Sorry, there's something problem in our internal.");
+                    if(response && response.error && response.error_message !== null)
+                        $("#signup-alert").html(response.error_message);
                 }
             },
             error: function (response, status) {
@@ -129,28 +136,43 @@ $("#btn-add-form-url-list").on("click", function(){
     $("#btn-update-form-url-list").css("display", "none");
 
     $("#btn-save-form-url-list").on("click", function(){
-        var url_original = $("#form-url-original").val();
-        var url_conversion = $("#form-url-conversion").val();
-        $.ajax({
-            type: "POST",
-            url: "/urlconversion",
-            data: {url_original: url_original, url_conversion: url_conversion},
-            dataType: "json",
-            success: function(response, status) {
-                if(response && !response.error){
-                    location.reload();
-                    // alert(JSON.stringify(response));
-                }
-                else {
+        var url_original = ($("#form-url-original").val())?$("#form-url-original").val():null;
+        var form_submit = false;
+        if(url_original != null)
+            form_submit = true;
+        
+        if(form_submit){
+            $.ajax({
+                type: "POST",
+                url: "/urlconversion",
+                data: {url_original: url_original},
+                dataType: "json",
+                success: function(response, status) {
+                    if(response && !response.error){
+                        location.reload();
+                        // alert(JSON.stringify(response));
+                    }
+                    else {
+                        $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
+                        $("#form-url-alert").html("Sorry, there's something problem in our internal.");
+                        if(response && response.error && response.error_message !== null)
+                            $("#form-url-alert").html(response.error_message);
+                    }
+                },
+                error: function (response, status) {
                     $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
                     $("#form-url-alert").html("Sorry, there's something problem in our internal.");
-                }
-            },
-            error: function (response, status) {
-                $("#form-url-alert").removeClass("alert-success").addClass("alert-danger");
-                $("#form-url-alert").html("Sorry, there's something problem in our internal.");
-            },
-        });
+                },
+            });
+        }
+        else{
+            $("#form-url-alert").removeClass("alert-info").addClass("alert-danger");
+            $("#form-url-alert").html("Please fill URL field!");
+    
+            if(url_original == null)
+                $("#form-url-original").parent().removeClass("has-success").addClass("has-error");
+            else $("#form-url-original").parent().removeClass("has-error").addClass("has-success");
+        }
     });
 });
 
